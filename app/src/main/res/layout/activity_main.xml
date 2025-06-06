@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground">
+
+    <!-- RecyclerView for displaying alarms -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/alarmList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+    <!-- Optional: Message when no alarms are added -->
+    <TextView
+        android:id="@+id/emptyMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No alarms yet"
+        android:textSize="18sp"
+        android:textColor="#888888"
+        android:layout_gravity="center" />
+
+    <!-- Floating action button to add new alarm -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addAlarmFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Add Alarm"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/purple_500"
+        app:tint="@android:color/white"
+        app:layout_anchor="@id/alarmList"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

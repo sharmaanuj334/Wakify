@@ -3,6 +3,7 @@ package com.example.wakify
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -21,10 +22,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: AlarmAdapter
     private val requestCodeGen = AtomicInteger(1)
     private val SET_ALARM_REQUEST_CODE = 1001
+    private val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Request notification permission on Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
+            }
+        }
 
         val recyclerView = findViewById<RecyclerView>(R.id.alarmList)
         val fab = findViewById<FloatingActionButton>(R.id.addAlarmFab)

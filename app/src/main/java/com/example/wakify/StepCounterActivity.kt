@@ -2,17 +2,14 @@ package com.example.wakify
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.media.Ringtone
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -28,13 +25,17 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var stepsTextView: TextView
     private lateinit var instructionTextView: TextView
 
-    private var ringtone: Ringtone? = null
-    private var wakeLock: PowerManager.WakeLock? = null
-
     private val PERMISSION_REQUEST_CODE = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Show over lock screen and turn screen on
+        setShowWhenLocked(true)
+        setTurnScreenOn(true)
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        keyguardManager.requestDismissKeyguard(this, null)
+
         setContentView(R.layout.activity_step_counter)
 
         stepsTextView = findViewById(R.id.stepsTextView)
@@ -45,48 +46,32 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.ACTIVITY_RECOGNITION), PERMISSION_REQUEST_CODE)
-                return  // Wait for permission result before continuing
+                return
             }
         }
 
-        setupSensorAndAlarm()
+        setupSensor()
     }
 
-    private fun setupSensorAndAlarm() {
-        // Wake up and unlock screen
-        wakeAndUnlockScreen()
-
-        // Initialize step detector sensor
+    private fun setupSensor() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         if (stepSensor == null) {
             Toast.makeText(this, "Step Detector not available!", Toast.LENGTH_LONG).show()
+            stopAlarmService()
             finish()
             return
         }
 
         Log.d("StepCounter", "Step detector sensor registered")
-
-        // Play alarm sound
-        val alarmUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)
-        ringtone?.play()
     }
 
-    private fun wakeAndUnlockScreen() {
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(
-            PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "wakify:alarmWakeLock"
-        )
-        wakeLock?.acquire(10 * 60 * 1000L)  // 10 minutes
-
-        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val keyguardLock = keyguardManager.newKeyguardLock("wakify:alarmKeyguardLock")
-        keyguardLock.disableKeyguard()
+    private fun stopAlarmService() {
+        val serviceIntent = Intent(this, AlarmService::class.java).apply {
+            action = AlarmService.ACTION_STOP
+        }
+        startService(serviceIntent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -94,9 +79,10 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Activity Recognition permission granted", Toast.LENGTH_SHORT).show()
-                setupSensorAndAlarm()  // Continue setup now that permission is granted
+                setupSensor()
             } else {
                 Toast.makeText(this, "Permission denied. Steps won't be counted.", Toast.LENGTH_LONG).show()
+                stopAlarmService()
                 finish()
             }
         }
@@ -116,8 +102,7 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        ringtone?.stop()
-        wakeLock?.release()
+        sensorManager?.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -128,7 +113,7 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
 
             if (stepsTaken >= targetSteps) {
                 Toast.makeText(this, "Alarm dismissed!", Toast.LENGTH_SHORT).show()
-                ringtone?.stop()
+                stopAlarmService()
                 finish()
             }
         }

@@ -3,20 +3,18 @@ package com.example.wakify
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
-import android.widget.Toast
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
+        if (context == null) return
         val requestCode = intent?.getIntExtra("requestCode", -1) ?: -1
-
-        Toast.makeText(context, "Alarm #$requestCode Triggered!", Toast.LENGTH_SHORT).show()
         Log.d("AlarmReceiver", "Alarm triggered with request code: $requestCode")
 
-        // Start StepCounterActivity when alarm goes off
-        val stepIntent = Intent(context, StepCounterActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val serviceIntent = Intent(context, AlarmService::class.java).apply {
+            putExtra("requestCode", requestCode)
         }
-        context?.startActivity(stepIntent)
+        context.startForegroundService(serviceIntent)
     }
 }

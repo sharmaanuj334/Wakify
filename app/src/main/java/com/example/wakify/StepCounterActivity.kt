@@ -14,6 +14,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
 
@@ -22,15 +23,25 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var stepsTaken: Int = 0
     private val targetSteps = 20
 
-    private lateinit var stepsTextView: TextView
+    private lateinit var stepsCountText: TextView
+    private lateinit var stepsLabelText: TextView
     private lateinit var instructionTextView: TextView
+    private lateinit var motivationalText: TextView
+    private lateinit var progressIndicator: CircularProgressIndicator
 
     private val PERMISSION_REQUEST_CODE = 1001
+
+    private val motivationalMessages = arrayOf(
+        "Keep walking! You can do it",
+        "Almost there, keep going!",
+        "You're doing great!",
+        "Don't stop now!",
+        "Wake up champion!"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Show over lock screen and turn screen on
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -38,11 +49,18 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
 
         setContentView(R.layout.activity_step_counter)
 
-        stepsTextView = findViewById(R.id.stepsTextView)
+        stepsCountText = findViewById(R.id.stepsCountText)
+        stepsLabelText = findViewById(R.id.stepsLabelText)
         instructionTextView = findViewById(R.id.instructionTextView)
-        instructionTextView.text = "Walk $targetSteps steps to dismiss the alarm"
+        motivationalText = findViewById(R.id.motivationalText)
+        progressIndicator = findViewById(R.id.stepProgressIndicator)
 
-        // Check for Activity Recognition permission if needed
+        instructionTextView.text = "Walk $targetSteps steps to dismiss the alarm"
+        stepsLabelText.text = "of $targetSteps steps"
+        stepsCountText.text = "0"
+        progressIndicator.max = 100
+        progressIndicator.progress = 0
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (checkSelfPermission(android.Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.ACTIVITY_RECOGNITION), PERMISSION_REQUEST_CODE)
@@ -108,11 +126,25 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR) {
             stepsTaken++
-            stepsTextView.text = "Steps taken: $stepsTaken / $targetSteps"
+            val progressPercent = ((stepsTaken.toFloat() / targetSteps) * 100).toInt().coerceAtMost(100)
+
+            stepsCountText.text = "$stepsTaken"
+            stepsLabelText.text = "of $targetSteps steps"
+            progressIndicator.setProgressCompat(progressPercent, true)
+
+            // Update motivational text based on progress
+            motivationalText.text = when {
+                progressPercent < 25 -> motivationalMessages[0]
+                progressPercent < 50 -> motivationalMessages[1]
+                progressPercent < 75 -> motivationalMessages[2]
+                progressPercent < 100 -> motivationalMessages[3]
+                else -> motivationalMessages[4]
+            }
+
             Log.d("StepCounter", "Step detected. Total: $stepsTaken")
 
             if (stepsTaken >= targetSteps) {
-                Toast.makeText(this, "Alarm dismissed!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Alarm dismissed! Good morning!", Toast.LENGTH_SHORT).show()
                 stopAlarmService()
                 finish()
             }

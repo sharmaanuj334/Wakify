@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Wakify Brand Palette - Dark Theme -->
+    <color name="wakify_primary">#FF90CAF9</color>           <!-- Light blue -->
+    <color name="wakify_primary_variant">#FF64B5F6</color>
+    <color name="wakify_on_primary">#FF0D1B2A</color>
+    <color name="wakify_secondary">#FFFFD54F</color>         <!-- Lighter amber -->
+    <color name="wakify_secondary_variant">#FFFFCA28</color>
+    <color name="wakify_on_secondary">#FF1B2838</color>
+    <color name="wakify_background">#FF0D1117</color>        <!-- Very dark -->
+    <color name="wakify_surface">#FF161B22</color>
+    <color name="wakify_surface_variant">#FF21262D</color>
+    <color name="wakify_on_background">#FFE6EDF3</color>
+    <color name="wakify_on_surface">#FFE6EDF3</color>
+    <color name="wakify_on_surface_variant">#FF8B949E</color>
+    <color name="wakify_outline">#FF30363D</color>
+    <color name="wakify_error">#FFEF5350</color>
+    <color name="wakify_on_error">#FF0D1117</color>
+
+    <!-- Step counter colors -->
+    <color name="wakify_progress_track">#FF21262D</color>
+    <color name="wakify_progress_indicator">#FF66BB6A</color>
+    <color name="wakify_step_bg">#FF0D1117</color>
+
+    <!-- Card colors -->
+    <color name="wakify_card_bg">#FF161B22</color>
+    <color name="wakify_card_stroke">#1AFFFFFF</color>
+    <color name="wakify_alarm_time">#FFE6EDF3</color>
+    <color name="wakify_alarm_ampm">#FF8B949E</color>
+    <color name="wakify_alarm_label">#FF6E7681</color>
+    <color name="wakify_delete_tint">#FFEF5350</color>
+
+    <!-- Gradient header -->
+    <color name="wakify_gradient_start">#FF0D1117</color>
+    <color name="wakify_gradient_end">#FF161B22</color>
+
+    <!-- FAB -->
+    <color name="wakify_fab">#FFFFD54F</color>
+    <color name="wakify_fab_icon">#FF0D1117</color>
+</resources>

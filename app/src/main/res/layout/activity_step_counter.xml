@@ -1,27 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/stepCounterLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
-    android:background="@android:color/white">
+    android:background="@drawable/bg_step_counter">
 
-    <TextView
-        android:id="@+id/instructionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Walk to stop the alarm!"
-        android:textSize="18sp"
-        android:layout_marginTop="20dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
 
-    <TextView
-        android:id="@+id/stepsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Steps taken: 0 / 20"
-        android:textSize="22sp"
-        android:layout_marginTop="30dp"/>
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time to Wake Up!"
+            android:textSize="28sp"
+            android:textColor="#FFFFFFFF"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.01"
+            android:layout_marginBottom="8dp" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/instructionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Walk 20 steps to dismiss the alarm"
+            android:textSize="15sp"
+            android:textColor="#B3FFFFFF"
+            android:fontFamily="sans-serif"
+            android:layout_marginBottom="48dp" />
+
+        <!-- Circular progress area -->
+        <FrameLayout
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center">
+
+            <!-- Background circular track -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/stepProgressBackground"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                app:indicatorSize="200dp"
+                app:trackThickness="12dp"
+                app:trackColor="#33FFFFFF"
+                app:indicatorColor="#33FFFFFF"
+                android:progress="100"
+                android:max="100"
+                app:trackCornerRadius="6dp" />
+
+            <!-- Foreground progress -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/stepProgressIndicator"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                app:indicatorSize="200dp"
+                app:trackThickness="12dp"
+                app:trackColor="@android:color/transparent"
+                app:indicatorColor="@color/wakify_progress_indicator"
+                android:progress="0"
+                android:max="100"
+                app:trackCornerRadius="6dp" />
+
+            <!-- Steps count in center -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_walking"
+                    android:layout_marginBottom="8dp"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:id="@+id/stepsCountText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="48sp"
+                    android:textColor="#FFFFFFFF"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/stepsLabelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="of 20 steps"
+                    android:textSize="14sp"
+                    android:textColor="#80FFFFFF"
+                    android:fontFamily="sans-serif" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- Steps text below the ring -->
+        <TextView
+            android:id="@+id/stepsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Steps taken: 0 / 20"
+            android:textSize="16sp"
+            android:textColor="#B3FFFFFF"
+            android:fontFamily="sans-serif"
+            android:layout_marginTop="32dp"
+            android:visibility="gone" />
+
+        <!-- Motivational text -->
+        <TextView
+            android:id="@+id/motivationalText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Keep walking! You can do it"
+            android:textSize="16sp"
+            android:textColor="@color/wakify_secondary"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="40dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

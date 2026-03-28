@@ -1,11 +1,11 @@
 package com.example.wakify
 
-import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
 import java.util.*
 
 class SetAlarmActivity : AppCompatActivity() {
@@ -17,12 +17,17 @@ class SetAlarmActivity : AppCompatActivity() {
         setContentView(R.layout.setting_alarm)
 
         val timePicker = findViewById<TimePicker>(R.id.timePicker)
-        val setAlarmBtn = findViewById<Button>(R.id.setAlarmBtn)
+        val setAlarmBtn = findViewById<MaterialButton>(R.id.setAlarmBtn)
+        val backButton = findViewById<ImageButton>(R.id.backButton)
 
-        timePicker.setIs24HourView(true)
+        timePicker.setIs24HourView(false)
         timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
             selectedHour = hourOfDay
             selectedMinute = minute
+        }
+
+        backButton.setOnClickListener {
+            finish()
         }
 
         setAlarmBtn.setOnClickListener {

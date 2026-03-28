@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Legacy colors kept for compatibility -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +8,42 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Wakify Brand Palette - Light Theme -->
+    <color name="wakify_primary">#FF1B2838</color>           <!-- Deep navy -->
+    <color name="wakify_primary_variant">#FF0D1B2A</color>   <!-- Darker navy -->
+    <color name="wakify_on_primary">#FFFFFFFF</color>
+    <color name="wakify_secondary">#FFFFC107</color>         <!-- Amber/gold -->
+    <color name="wakify_secondary_variant">#FFFFA000</color> <!-- Darker amber -->
+    <color name="wakify_on_secondary">#FF1B2838</color>
+    <color name="wakify_background">#FFF5F5F7</color>        <!-- Soft off-white -->
+    <color name="wakify_surface">#FFFFFFFF</color>
+    <color name="wakify_surface_variant">#FFEEF1F6</color>   <!-- Subtle blue-gray -->
+    <color name="wakify_on_background">#FF1B2838</color>
+    <color name="wakify_on_surface">#FF1B2838</color>
+    <color name="wakify_on_surface_variant">#FF6B7280</color>
+    <color name="wakify_outline">#FFD1D5DB</color>
+    <color name="wakify_error">#FFE53935</color>
+    <color name="wakify_on_error">#FFFFFFFF</color>
+
+    <!-- Step counter colors -->
+    <color name="wakify_progress_track">#FFE8EAF0</color>
+    <color name="wakify_progress_indicator">#FF4CAF50</color>  <!-- Green for progress -->
+    <color name="wakify_step_bg">#FF1B2838</color>
+
+    <!-- Card colors -->
+    <color name="wakify_card_bg">#FFFFFFFF</color>
+    <color name="wakify_card_stroke">#1A1B2838</color>
+    <color name="wakify_alarm_time">#FF1B2838</color>
+    <color name="wakify_alarm_ampm">#FF6B7280</color>
+    <color name="wakify_alarm_label">#FF9CA3AF</color>
+    <color name="wakify_delete_tint">#FFE53935</color>
+
+    <!-- Gradient header -->
+    <color name="wakify_gradient_start">#FF1B2838</color>
+    <color name="wakify_gradient_end">#FF2D4059</color>
+
+    <!-- FAB -->
+    <color name="wakify_fab">#FFFFC107</color>
+    <color name="wakify_fab_icon">#FF1B2838</color>
 </resources>

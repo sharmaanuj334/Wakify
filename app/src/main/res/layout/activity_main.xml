@@ -4,26 +4,96 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="@color/wakify_background"
+    android:fitsSystemWindows="true">
 
-    <!-- RecyclerView for displaying alarms -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/alarmList"
+    <!-- Header section with gradient background -->
+    <LinearLayout
+        android:id="@+id/headerSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_header_gradient"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp"
+        android:paddingHorizontal="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wakify"
+            android:textSize="32sp"
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02" />
+
+        <TextView
+            android:id="@+id/alarmCountText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No alarms set"
+            android:textSize="14sp"
+            android:textColor="#B3FFFFFF"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif" />
+
+    </LinearLayout>
+
+    <!-- Alarm list area -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical" />
+        android:layout_marginTop="140dp">
 
-    <!-- Optional: Message when no alarms are added -->
-    <TextView
-        android:id="@+id/emptyMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No alarms yet"
-        android:textSize="18sp"
-        android:textColor="#888888"
-        android:layout_gravity="center" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/alarmList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp"
+            android:paddingHorizontal="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:overScrollMode="never" />
+
+        <!-- Empty state -->
+        <LinearLayout
+            android:id="@+id/emptyStateLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_clock_large"
+                android:alpha="0.3"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/emptyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No alarms yet"
+                android:textSize="18sp"
+                android:textColor="@color/wakify_on_surface_variant"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap + to add your first alarm"
+                android:textSize="14sp"
+                android:textColor="@color/wakify_alarm_label"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <!-- Floating action button to add new alarm -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -31,12 +101,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="Add Alarm"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/purple_500"
-        app:tint="@android:color/white"
-        app:layout_anchor="@id/alarmList"
-        app:layout_anchorGravity="bottom|end"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/wakify_fab"
+        app:tint="@color/wakify_fab_icon"
+        app:fabSize="normal"
+        app:elevation="8dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Wakify.Fab"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp" />
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

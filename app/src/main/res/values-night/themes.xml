@@ -15,12 +15,11 @@
         <item name="colorOnError">@color/wakify_on_error</item>
         <item name="colorOutline">@color/wakify_outline</item>
         <item name="android:colorBackground">@color/wakify_background</item>
-        <item name="android:statusBarColor">@color/wakify_primary</item>
+        <item name="android:statusBarColor">@color/wakify_background</item>
         <item name="android:navigationBarColor">@color/wakify_background</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Transparent status bar variant for step counter -->
     <style name="Theme.Wakify.FullScreen" parent="Theme.Wakify">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/wakify_step_bg</item>

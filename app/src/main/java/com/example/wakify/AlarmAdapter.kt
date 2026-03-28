@@ -3,6 +3,7 @@ package com.example.wakify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -10,7 +11,6 @@ class AlarmAdapter(
     private val alarms: MutableList<Alarm>
 ) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
 
-    // Interface for click listener to notify MainActivity
     interface OnAlarmClickListener {
         fun onAlarmClick(position: Int)
     }
@@ -19,10 +19,16 @@ class AlarmAdapter(
 
     inner class AlarmViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val alarmText: TextView = view.findViewById(R.id.alarmTimeText)
+        val alarmAmPm: TextView = view.findViewById(R.id.alarmAmPm)
+        val alarmLabel: TextView = view.findViewById(R.id.alarmLabel)
+        val deleteBtn: ImageButton = view.findViewById(R.id.deleteAlarmBtn)
 
         init {
-            view.setOnClickListener {
-                listener?.onAlarmClick(adapterPosition)
+            deleteBtn.setOnClickListener {
+                val pos = adapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener?.onAlarmClick(pos)
+                }
             }
         }
     }
@@ -35,7 +41,16 @@ class AlarmAdapter(
 
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {
         val alarm = alarms[position]
-        holder.alarmText.text = String.format("Alarm set for %02d:%02d", alarm.hour, alarm.minute)
+        val displayHour = when {
+            alarm.hour == 0 -> 12
+            alarm.hour > 12 -> alarm.hour - 12
+            else -> alarm.hour
+        }
+        val amPm = if (alarm.hour < 12) "AM" else "PM"
+
+        holder.alarmText.text = String.format("%d:%02d", displayHour, alarm.minute)
+        holder.alarmAmPm.text = amPm
+        holder.alarmLabel.text = "Tap trash to delete"
     }
 
     override fun getItemCount(): Int = alarms.size

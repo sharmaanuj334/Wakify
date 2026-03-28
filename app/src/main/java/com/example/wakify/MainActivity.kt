@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,13 +22,19 @@ class MainActivity : AppCompatActivity() {
 
     private val alarmList = mutableListOf<Alarm>()
     private lateinit var adapter: AlarmAdapter
-    private val requestCodeGen = AtomicInteger(1)
+    private lateinit var requestCodeGen: AtomicInteger
     private val SET_ALARM_REQUEST_CODE = 1001
     private val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
+    private lateinit var emptyStateLayout: LinearLayout
+    private lateinit var alarmCountText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Load persisted alarms and request code counter
+        alarmList.addAll(AlarmStorage.loadAlarms(this))
+        requestCodeGen = AtomicInteger(AlarmStorage.loadNextRequestCode(this))
 
         // Request notification permission on Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -37,18 +45,17 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView = findViewById<RecyclerView>(R.id.alarmList)
         val fab = findViewById<FloatingActionButton>(R.id.addAlarmFab)
-        val emptyText = findViewById<TextView>(R.id.emptyMessage)
+        emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        alarmCountText = findViewById(R.id.alarmCountText)
 
         adapter = AlarmAdapter(alarmList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Set up click listener for deleting alarms
         adapter.listener = object : AlarmAdapter.OnAlarmClickListener {
             override fun onAlarmClick(position: Int) {
                 val alarm = alarmList[position]
 
-                // Cancel the alarm in AlarmManager
                 val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
                 val intent = Intent(this@MainActivity, AlarmReceiver::class.java)
                 val pendingIntent = PendingIntent.getBroadcast(
@@ -59,12 +66,11 @@ class MainActivity : AppCompatActivity() {
                 )
                 alarmManager.cancel(pendingIntent)
 
-                // Remove alarm from list and notify adapter
                 alarmList.removeAt(position)
                 adapter.notifyItemRemoved(position)
+                AlarmStorage.saveAlarms(this@MainActivity, alarmList)
 
-                // Show empty message if list is empty
-                emptyText.visibility = if (alarmList.isEmpty()) TextView.VISIBLE else TextView.GONE
+                updateEmptyState()
 
                 Toast.makeText(this@MainActivity, "Alarm deleted", Toast.LENGTH_SHORT).show()
             }
@@ -85,8 +91,18 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, SET_ALARM_REQUEST_CODE)
         }
 
-        // Initially set empty message visibility
-        emptyText.visibility = if (alarmList.isEmpty()) TextView.VISIBLE else TextView.GONE
+        updateEmptyState()
+    }
+
+    private fun updateEmptyState() {
+        if (alarmList.isEmpty()) {
+            emptyStateLayout.visibility = View.VISIBLE
+            alarmCountText.text = "No alarms set"
+        } else {
+            emptyStateLayout.visibility = View.GONE
+            val count = alarmList.size
+            alarmCountText.text = if (count == 1) "1 alarm set" else "$count alarms set"
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -96,13 +112,15 @@ class MainActivity : AppCompatActivity() {
             val minute = data.getIntExtra("minute", -1)
 
             if (hour >= 0 && minute >= 0) {
-                val requestCode = requestCodeGen.getAndIncrement()
-                val alarm = Alarm(hour, minute, requestCode)
+                val code = requestCodeGen.getAndIncrement()
+                AlarmStorage.saveNextRequestCode(this, requestCodeGen.get())
+
+                val alarm = Alarm(hour, minute, code)
                 alarmList.add(alarm)
                 adapter.notifyItemInserted(alarmList.size - 1)
+                AlarmStorage.saveAlarms(this, alarmList)
 
-                findViewById<TextView>(R.id.emptyMessage).visibility =
-                    if (alarmList.isEmpty()) TextView.VISIBLE else TextView.GONE
+                updateEmptyState()
 
                 setExactAlarm(alarm)
             }
@@ -136,6 +154,12 @@ class MainActivity : AppCompatActivity() {
             pendingIntent
         )
 
-        Toast.makeText(this, "Alarm set for ${"%02d".format(alarm.hour)}:${"%02d".format(alarm.minute)}", Toast.LENGTH_SHORT).show()
+        val displayHour = when {
+            alarm.hour == 0 -> 12
+            alarm.hour > 12 -> alarm.hour - 12
+            else -> alarm.hour
+        }
+        val amPm = if (alarm.hour < 12) "AM" else "PM"
+        Toast.makeText(this, "Alarm set for $displayHour:${"%02d".format(alarm.minute)} $amPm", Toast.LENGTH_SHORT).show()
     }
 }

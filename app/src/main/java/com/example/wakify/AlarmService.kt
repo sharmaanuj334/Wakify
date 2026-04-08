@@ -49,6 +49,9 @@ class AlarmService : Service() {
             "wakify:alarmServiceWakeLock"
         ).apply { acquire(10 * 60 * 1000L) }
 
+        // Release the receiver's bridge WakeLock now that we have our own
+        AlarmReceiver.releaseWakeLock()
+
         // Build full-screen intent for StepCounterActivity
         val stepIntent = Intent(this, StepCounterActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)

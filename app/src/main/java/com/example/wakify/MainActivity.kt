@@ -4,8 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
 import android.widget.LinearLayout
@@ -55,16 +57,7 @@ class MainActivity : AppCompatActivity() {
         adapter.listener = object : AlarmAdapter.OnAlarmClickListener {
             override fun onAlarmClick(position: Int) {
                 val alarm = alarmList[position]
-
-                val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-                val intent = Intent(this@MainActivity, AlarmReceiver::class.java)
-                val pendingIntent = PendingIntent.getBroadcast(
-                    this@MainActivity,
-                    alarm.requestCode,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-                alarmManager.cancel(pendingIntent)
+                AlarmScheduler.cancelAlarm(this@MainActivity, alarm)
 
                 alarmList.removeAt(position)
                 adapter.notifyItemRemoved(position)
@@ -85,6 +78,9 @@ class MainActivity : AppCompatActivity() {
                 return
             }
         }
+
+        // Request battery optimization exemption so alarms fire reliably in Doze
+        requestBatteryOptimizationExemption()
 
         fab.setOnClickListener {
             val intent = Intent(this, SetAlarmActivity::class.java)
@@ -128,31 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setExactAlarm(alarm: Alarm) {
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, alarm.hour)
-            set(Calendar.MINUTE, alarm.minute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-            if (before(Calendar.getInstance())) add(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        val intent = Intent(this, AlarmReceiver::class.java).apply {
-            putExtra("requestCode", alarm.requestCode)
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            alarm.requestCode,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            pendingIntent
-        )
+        AlarmScheduler.scheduleAlarm(this, alarm)
 
         val displayHour = when {
             alarm.hour == 0 -> 12
@@ -161,5 +133,15 @@ class MainActivity : AppCompatActivity() {
         }
         val amPm = if (alarm.hour < 12) "AM" else "PM"
         Toast.makeText(this, "Alarm set for $displayHour:${"%02d".format(alarm.minute)} $amPm", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun requestBatteryOptimizationExemption() {
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        }
     }
 }
